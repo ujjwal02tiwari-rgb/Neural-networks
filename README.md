@@ -1,6 +1,6 @@
 # NNFS Java Monorepo (Maven)
 
-Maven multi-module version of the Sentdex-inspired "Neural Networks from Scratch" build.
+Maven multi-module version of Neural Networks build.
 
 ## Modules
 - `nnfs-java-core` — pure Java NN + `Trainer` that writes `model/weights.json`
