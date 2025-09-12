@@ -1,0 +1,1 @@
+export default function Page(){return <main style={{fontFamily:'system-ui',margin:'2rem'}}><h1>NNFS Java (Maven)</h1><p>Set NEXT_PUBLIC_API_BASE_URL to your Java API and build.</p></main>}
