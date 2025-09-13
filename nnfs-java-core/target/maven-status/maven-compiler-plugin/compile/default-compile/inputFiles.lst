@@ -1,0 +1,7 @@
+/workspaces/Neural-networks/nnfs-java-core/src/main/java/com/nnfs/layers/Dense.java
+/workspaces/Neural-networks/nnfs-java-core/src/main/java/com/nnfs/optim/SGD.java
+/workspaces/Neural-networks/nnfs-java-core/src/main/java/com/nnfs/nn/Model.java
+/workspaces/Neural-networks/nnfs-java-core/src/main/java/com/nnfs/math/MatrixOps.java
+/workspaces/Neural-networks/nnfs-java-core/src/main/java/com/nnfs/train/Trainer.java
+/workspaces/Neural-networks/nnfs-java-core/src/main/java/com/nnfs/loss/CategoricalCrossEntropy.java
+/workspaces/Neural-networks/nnfs-java-core/src/main/java/com/nnfs/data/SpiralData.java
