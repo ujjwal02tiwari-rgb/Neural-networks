@@ -25,25 +25,32 @@
   </properties>
 
   <dependencies>
-    <!-- Spring Boot starters -->
+    <!-- REST / Web -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-web</artifactId>
     </dependency>
 
+    <!-- Actuator for health check -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-actuator</artifactId>
     </dependency>
 
-    <!-- Core module dependency -->
+    <!-- WebSocket / Messaging -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-websocket</artifactId>
+    </dependency>
+
+    <!-- Core module -->
     <dependency>
       <groupId>com.nnfs</groupId>
       <artifactId>nnfs-java-core</artifactId>
       <version>0.1.0</version>
     </dependency>
 
-    <!-- Test support -->
+    <!-- Testing -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-test</artifactId>
