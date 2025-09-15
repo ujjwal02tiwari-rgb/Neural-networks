@@ -1,26 +1,27 @@
 
+# =========================
+# 1. Build stage
+# =========================
 FROM maven:3.9.9-eclipse-temurin-17 AS build
 
 WORKDIR /app
 
+# Copy full repo (needed for multi-module build)
+COPY . .
 
-COPY pom.xml .
-RUN mvn dependency:go-offline
-
-
-COPY api-java-spring/src ./src
-
-
-RUN mvn clean package -DskipTests
+# Build all modules, skip tests
+RUN mvn clean install -DskipTests
 
 
-
+# =========================
+# 2. Runtime stage (Spring Boot app only)
+# =========================
 FROM eclipse-temurin:17-jre-alpine
 
 WORKDIR /app
 
-
-COPY --from=build /app/target/*.jar app.jar
+# Copy Spring Boot JAR from api-java-spring
+COPY --from=build /app/api-java-spring/target/*.jar app.jar
 
 EXPOSE 8080
 ENTRYPOINT ["java","-jar","app.jar"]
