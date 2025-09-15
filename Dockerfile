@@ -5,11 +5,13 @@ FROM maven:3.9.9-eclipse-temurin-17 AS build
 
 WORKDIR /app
 
-# Copy full repo (root pom + modules)
-COPY . .
+# Copy core module and build it
+COPY nnfs-java-core ./nnfs-java-core
+RUN mvn -f nnfs-java-core/pom.xml clean install -DskipTests
 
-# Build core + spring modules, skip tests
-RUN mvn clean install -DskipTests -pl api-java-spring,nnfs-java-core -am
+# Copy API module and build it (resolves nnfs-java-core from local repo)
+COPY api-java-spring ./api-java-spring
+RUN mvn -f api-java-spring/pom.xml clean package -DskipTests
 
 
 # =========================
