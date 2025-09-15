@@ -1,27 +1,38 @@
 # =========================
-# 1. Build stage
+# 1. Build nnfs-java-core
 # =========================
-FROM maven:3.9.9-eclipse-temurin-17 AS build
-
+FROM maven:3.9.9-eclipse-temurin-17 AS core-build
 WORKDIR /app
 
-# Copy entire repo (so Maven sees all modules)
-COPY . .
+# Copy core module
+COPY nnfs-java-core ./nnfs-java-core
 
-# Build only the core library + Spring Boot app, skip tests
-RUN mvn clean install -DskipTests -pl api-java-spring,nnfs-java-core -am
+# Build and install in local Maven repo
+RUN mvn -f nnfs-java-core/pom.xml clean install -DskipTests
 
 
 # =========================
-# 2. Runtime stage
+# 2. Build api-java-spring
+# =========================
+FROM maven:3.9.9-eclipse-temurin-17 AS spring-build
+WORKDIR /app
+
+# Copy Spring Boot module + core module
+COPY api-java-spring ./api-java-spring
+COPY --from=core-build /root/.m2 /root/.m2
+
+# Build Spring Boot app
+RUN mvn -f api-java-spring/pom.xml clean package -DskipTests
+
+
+# =========================
+# 3. Runtime
 # =========================
 FROM eclipse-temurin:17-jre-alpine
-
 WORKDIR /app
 
-# Copy only the Spring Boot JAR for runtime
-COPY --from=build /app/api-java-spring/target/*.jar app.jar
+# Copy Spring Boot jar
+COPY --from=spring-build /app/api-java-spring/target/*.jar app.jar
 
 EXPOSE 8080
 ENTRYPOINT ["java","-jar","app.jar"]
-
