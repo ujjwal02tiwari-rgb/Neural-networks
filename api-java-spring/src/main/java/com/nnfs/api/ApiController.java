@@ -4,9 +4,6 @@ import com.nnfs.nn.Model;
 import com.nnfs.math.MatrixOps;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.stereotype.Controller;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,36 +16,49 @@ import java.util.concurrent.Executors;
 public class ApiController {
     private final Model model;
 
-    public ApiController() throws IOException {
+    public ApiController() {
+        Model tempModel;
         try (InputStream is = getClass().getResourceAsStream("/model/weights.json")) {
             if (is == null) {
-                this.model = new Model(2, 64, 3, 1337L);
-                return;
+                // No weights file found → fallback to default model
+                tempModel = new Model(2, 64, 3, 1337L);
+            } else {
+                String json = new String(is.readAllBytes(), StandardCharsets.UTF_8);
+                try {
+                    tempModel = WeightsLoader.load(json);
+                } catch (Exception e) {
+                    // Defensive fallback in case of corrupt weights.json
+                    e.printStackTrace();
+                    tempModel = new Model(2, 64, 3, 1337L);
+                }
             }
-            String json = new String(is.readAllBytes(), StandardCharsets.UTF_8);
-            this.model = WeightsLoader.load(json);
+        } catch (IOException e) {
+            // Defensive fallback in case of I/O error
+            e.printStackTrace();
+            tempModel = new Model(2, 64, 3, 1337L);
         }
+        this.model = tempModel;
     }
 
     // --- Health check ---
     @GetMapping("/health")
-    public Map<String, String> health(){
+    public Map<String, String> health() {
         return Map.of("status", "ok");
     }
 
     // --- Inference (alias for predict) ---
-    public record PredictRequest(double[][] x){}
-    public record PredictResponse(double[][] probs, int[] argmax){}
+    public record PredictRequest(double[][] x) {}
+    public record PredictResponse(double[][] probs, int[] argmax) {}
 
     @PostMapping("/predict")
-    public PredictResponse predict(@RequestBody PredictRequest req){
+    public PredictResponse predict(@RequestBody PredictRequest req) {
         double[][] probs = model.forward(req.x());
         int[] arg = MatrixOps.argmax(probs);
         return new PredictResponse(probs, arg);
     }
 
     @PostMapping("/inference")
-    public PredictResponse inference(@RequestBody PredictRequest req){
+    public PredictResponse inference(@RequestBody PredictRequest req) {
         return predict(req); // reuse predict
     }
 
