@@ -13,58 +13,57 @@ import java.util.concurrent.Executors;
 @RestController
 public class ExtraEndpointsController {
 
-    // Endpoint to start training (dummy implementation)
+   
     @PostMapping("/train")
     public ResponseEntity<Map<String, String>> train() {
         return ResponseEntity.ok(Map.of("status", "started"));
     }
 
-    // SSE endpoint for activations stream (dummy data)
-    @GetMapping("/activations/stream")
-    public SseEmitter activationsStream() {
-        SseEmitter emitter = new SseEmitter();
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        executor.execute(() -> {
-            try {
-                for (int i = 1; i <= 5; i++) {
-                    // Simulate activation data as random percentages
-                    emitter.send(Map.of(
-                            "layer", i,
-                            "active", Math.random(),
-                            "sparsity", Math.random()
-                    ));
-                    Thread.sleep(1000);
+   @GetMapping("/activations/stream")
+public SseEmitter activationsStream() {
+    SseEmitter emitter = new SseEmitter(Long.MAX_VALUE);
+    ExecutorService executor = Executors.newSingleThreadExecutor();
+    executor.execute(() -> {
+        try {
+            while (true) {
+                // Build an array of 64 random activation values
+                List<Double> values = new ArrayList<>();
+                for (int i = 0; i < 64; i++) {
+                    values.add(Math.random());
                 }
-                emitter.complete();
-            } catch (Exception e) {
-                emitter.completeWithError(e);
+                Map<String, Object> data = new HashMap<>();
+                data.put("values", values);
+                data.put("activity", Math.random()); // random sparsity/activation
+                emitter.send(data);
+                Thread.sleep(1000); // send every second
             }
-        });
-        executor.shutdown();
-        return emitter;
-    }
+        } catch (Exception e) {
+            emitter.completeWithError(e);
+        }
+    });
+    executor.shutdown();
+    return emitter;
+}
 
-    // SSE endpoint for layers stream (dummy data)
-    @GetMapping("/layers/stream")
-    public SseEmitter layersStream() {
-        SseEmitter emitter = new SseEmitter();
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        executor.execute(() -> {
-            try {
-                for (int i = 1; i <= 5; i++) {
-                    // Simulate layer graph data as random values
-                    emitter.send(Map.of(
-                            "layer", i,
-                            "nodes", (int)(Math.random() * 10 + 1)
-                    ));
-                    Thread.sleep(1000);
-                }
-                emitter.complete();
-            } catch (Exception e) {
-                emitter.completeWithError(e);
+@GetMapping("/layers/stream")
+public SseEmitter layersStream() {
+    SseEmitter emitter = new SseEmitter(Long.MAX_VALUE);
+    ExecutorService executor = Executors.newSingleThreadExecutor();
+    executor.execute(() -> {
+        try {
+            while (true) {
+                // Send only an activity value; the frontend will animate the graph
+                Map<String, Object> data = new HashMap<>();
+                data.put("activity", Math.random());
+                emitter.send(data);
+                Thread.sleep(1000);
             }
-        });
-        executor.shutdown();
-        return emitter;
-    }
+        } catch (Exception e) {
+            emitter.completeWithError(e);
+        }
+    });
+    executor.shutdown();
+    return emitter;
+}
+
 }
