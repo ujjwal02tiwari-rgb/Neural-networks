@@ -2,6 +2,6 @@ services:
   - type: web
     name: neural-networks-backend
     env: docker
-    plan: free   
+    plan: free
     dockerfilePath: ./Dockerfile
     autoDeploy: true
