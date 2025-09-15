@@ -1,11 +1,7 @@
 services:
   - type: web
     name: neural-networks-backend
-    env: java
-    buildCommand: ./mvnw clean install -DskipTests
-    startCommand: java -jar api-java-spring/target/*.jar
-    envVars:
-      - key: PORT
-        value: 8080
-    autoDeploy: true
+    env: docker
     plan: free   
+    dockerfilePath: ./Dockerfile
+    autoDeploy: true
