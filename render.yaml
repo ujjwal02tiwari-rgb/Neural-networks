@@ -2,6 +2,9 @@ services:
   - type: web
     name: neural-networks-backend
     env: docker
-    plan: free
+    plan: free   # change to starter/standard if needed
     dockerfilePath: ./Dockerfile
     autoDeploy: true
+    envVars:
+      - key: JAVA_TOOL_OPTIONS
+        value: "-Xmx512m"
